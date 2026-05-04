@@ -1,0 +1,235 @@
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Game</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<body>
+
+<div class="particles"></div>
+<div id="settingOverlay"></div>
+
+<div id="opening">
+    <h1>Quiz Zone</h1>
+</div>
+
+
+<div id="nameScreen" style="display: none;">
+
+	<div id="menuTitle">Quiz Zone</div>
+
+
+    <div class="mode-select">
+    <button id="newPlayerBtn">
+        🆕 Pemain Baru
+        <span>Buat akun baru dan mulai dari awal</span>
+    </button>
+
+    <button id="oldPlayerBtn">
+        🔑 Sudah Pernah Main
+        <span>Lanjutkan progress kamu sebelumnya</span>
+    </button>
+</div>
+<div id="formArea" class="input-box" style="display:none;">
+    
+    <h2 id="formTitle">AKSES PEMAIN</h2>
+
+    <input type="text" id="playerName" placeholder="Nama kamu..." />
+    <input type="text" id="playerId" placeholder="Masukkan ID" style="display:none;">
+</div>
+    <button id="startGameBtn">Mulai Game</button>
+
+</div>
+
+
+
+<div id="playerInfo" style="display: none;">
+
+    <span id="playerDisplay">👤 Player</span>
+    <span id="scoreDisplay">⭐ 0 | 🏆 0</span>
+</div>
+
+
+
+<div class="container" id="quizContainer" style="display: none;">
+
+    <h2>🧠 Quiz Game</h2>
+
+    <div id="progressText">Soal 1</div>
+    <div id="progressBar">
+        <div id="progressFill"></div>
+    </div>
+
+    <div id="quiz">
+        <div class="question" id="question">Pertanyaan</div>
+        <div id="answer-buttons"></div>
+        <button id="nextBtn" class="btn hide">Next</button>
+    </div>
+
+</div>
+
+<div id="result" class="hide score"></div>
+<button id="restartBtn" class="hide">Main Lagi</button>
+
+<div id="settingBtn">⚙️</div>
+
+<div id="settingPanel">
+    <h3>⚙️ Pengaturan</h3>
+
+	
+    <div class="setting-item">
+        <span>🔊 Sound Effect</span>
+        <label class="switch">
+            <input type="checkbox" id="toggleSound" checked>
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="setting-item">
+        <span>🎵 Background Music</span>
+        <label class="switch">
+            <input type="checkbox" id="toggleMusic" checked>
+            <span class="slider"></span>
+        </label>
+    </div>
+	
+	<div class="setting-item">
+    <span>🔉 Volume Musik</span>
+    <input type="range" id="musicVolume" min="0" max="1" step="0.1" value="0.4">
+</div>
+
+<div class="setting-item">
+    <span>⏱️ Waktu Soal</span>
+    <select id="timerSetting">
+        <option value="10">10 detik</option>
+        <option value="20">20 detik</option>
+        <option value="30" selected>30 detik</option>
+    </select>
+</div>
+
+<div class="setting-item">
+    <span>❤️ Nyawa</span>
+   <select id="livesSetting">
+    <option value="1">1 nyawa</option>
+    <option value="3" selected>3 nyawa</option>
+    <option value="5">5 nyawa</option>
+</select>
+
+</div>
+    <button id="closeSetting">Tutup</button>
+</div>
+
+
+
+<div id="categoryScreen" style="display:none;">
+	<h2 class="category-title">PILIH KATEGORI QUIZ</h2>
+
+
+  <div class="category-list">
+
+    <button class="categoryBtn" data-cat="sejarah">
+        <i data-lucide="landmark"></i>
+        <span>Sejarah</span>
+    </button>
+
+    <button class="categoryBtn" data-cat="geografi">
+        <i data-lucide="globe"></i>
+        <span>Geografi</span>
+    </button>
+
+    <button class="categoryBtn" data-cat="ibukota">
+        <i data-lucide="building"></i>
+        <span>Ibu Kota</span>
+    </button>
+
+    <button class="categoryBtn" data-cat="matematika">
+        <i data-lucide="calculator"></i>
+        <span>Matematika</span>
+    </button>
+
+    <button class="categoryBtn" data-cat="agama">
+        <i data-lucide="book-open"></i>
+        <span>Agama</span>
+    </button>
+
+    <button class="categoryBtn" data-cat="makanan">
+        <i data-lucide="utensils"></i>
+        <span>Makanan</span>
+    </button>
+
+    <button class="categoryBtn" data-cat="film">
+        <i data-lucide="film"></i>
+        <span>Film</span>
+    </button>
+
+    <button class="categoryBtn" data-cat="musik">
+        <i data-lucide="music"></i>
+        <span>Musik</span>
+    </button>
+
+    <button class="categoryBtn" data-cat="artis">
+        <i data-lucide="star"></i>
+        <span>Artis</span>
+    </button>
+	<button class="categoryBtn" data-cat="acak">
+		<i data-lucide="shuffle"></i>
+		<span>Acak</span>
+	</button>
+
+</div>
+
+
+
+</div>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs } 
+  from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "xxx",
+    authDomain: "quiz-zone-game.firebaseapp.com",
+    projectId: "quiz-zone-game",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.firebaseFirestore = { collection, addDoc, getDocs };
+
+  console.log("Firebase OK");
+</script>
+
+<audio id="clickSound" src="sound/click.mp3"></audio>
+<audio id="correctSound" src="sound/benar.mp3"></audio>
+<audio id="wrongSound" src="sound/salah.mp3"></audio>
+<audio id="bgMusic" src="sound/bg-music.mp3" loop preload="auto"></audio>
+<audio id="openingSound" src="opening.mp3"></audio>
+<audio id="startSound" src="sound/start.mp3"></audio>
+<audio id="timerSound" src="sound/timer.mp3"></audio>
+<audio id="resultSound" src="sound/victory.mp3"></audio>
+<audio id="gameOverSound" src="sound/gameover.mp3" preload="auto"></audio>
+
+
+
+
+
+<script type="module" src="script.js"></script>
+<div id="exitConfirm" class="confirm-box">
+    <div class="confirm-content">
+        <p>Yakin mau keluar dari game?</p>
+        <button id="yesExit">Iya</button>
+        <button id="noExit">Tidak</button>
+    </div>
+</div>
+<div id="backArrow">⟵</div>
+
+</body>
+</html>
